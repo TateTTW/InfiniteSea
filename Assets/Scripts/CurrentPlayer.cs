@@ -5,6 +5,8 @@ using UnityEngine;
 public class CurrentPlayer : MonoBehaviour
 {
     [SerializeField]
+    private GameObject level1Player;
+    [SerializeField]
     private GameObject level2Player;
     [SerializeField]
     private GameObject level3Player;
@@ -22,11 +24,6 @@ public class CurrentPlayer : MonoBehaviour
         {
             Debug.LogError("Duplicate CurrentPlayer instance", gameObject);
         }
-
-        if (player == null)
-        {
-            createInitPlayer();
-        }
     }
 
     // Update is called once per frame
@@ -42,17 +39,16 @@ public class CurrentPlayer : MonoBehaviour
             Player oldInfo = player.GetComponent<Player>();
             if (oldInfo != null)
             {
-                if (oldInfo.lvl == 2)
-                {
-                    ScoreManager.instance.amount -= 100;
+                GameObject prefab = oldInfo.lvl > 1 ? level3Player : level2Player;
 
-                    Destroy(player);
-                    player = Instantiate(level3Player, player.transform.position, player.transform.rotation);
-                    Player newInfo = player.GetComponent<Player>();
-                    newInfo.lvl = 3;
+                ScoreManager.instance.amount -= 100;
 
-                    CameraManager.instance.follow(player);
-                }
+                Destroy(player);
+                player = Instantiate(prefab, player.transform.position, player.transform.rotation);
+                Player newInfo = player.GetComponent<Player>();
+                newInfo.lvl = oldInfo.lvl + 1;
+
+                CameraManager.instance.follow(player);
             }
         }
     }
